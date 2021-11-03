@@ -3,7 +3,7 @@
 #include "ofMain.h"
 #include "ofxCv.h"
 #include "ofxOpenCv.h"
-#include "opencv2/opencv.hpp"
+#include "threadedContourFinder.hpp"
 
 class ofApp : public ofBaseApp {
 
@@ -26,14 +26,14 @@ public:
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
 
-    void getContours(cv::Mat imgDil, cv::Mat imgDraw);
-
     ofSoundStream soundStream;
     int sampleRate;
     int bufferSize;
 
     cv::Mat img, imgGray, imgBlur, imgblur, imgCanny, imgDilate, imgErode, kernel;
-    ofTexture texture;
     ofImage image;
-    // cv::Size s;
+
+    ofVideoGrabber camera;
+
+    threadedContourFinder find;
 };
