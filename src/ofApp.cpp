@@ -1,10 +1,4 @@
 #include "ofApp.h"
-#include "ofxCv/Helpers.h"
-#include "ofxCv/Utilities.h"
-#include "ofxCv/Wrappers.h"
-#include "opencv2/highgui.hpp"
-#include "opencv2/imgcodecs.hpp"
-#include "opencv2/imgproc.hpp"
 
 //--------------------------------------------------------------
 void ofApp::setup()
@@ -21,24 +15,22 @@ void ofApp::setup()
     // soundStream.setup(settings);
 
     camera.initGrabber(640, 480);
+    kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
 }
 
 //--------------------------------------------------------------
 void ofApp::update()
 {
     camera.update();
+
+    float newX = ofMap(mouseX, 0, ofGetWidth(), 20, 240);
+    float newY = ofMap(mouseY, 0, ofGetHeight(), 20, 240);
+
+    find.hysterisisThresholds(newX, newY);
+
     if (camera.isFrameNew()) {
         img = ofxCv::toCv(camera.getPixels());
-        cv::cvtColor(img, imgGray, cv::COLOR_BGR2GRAY);
-        cv::GaussianBlur(imgGray, imgblur, cv::Size(5, 5), 5, 0);
-        cv::Canny(imgGray, imgCanny, 50, 150);
-
-        kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
-
-        cv::dilate(imgCanny, imgDilate, kernel);
-        cv::erode(imgDilate, imgErode, kernel);
-
-        find.getContours(imgErode, img);
+        find.createContours(img, img);
     }
 }
 

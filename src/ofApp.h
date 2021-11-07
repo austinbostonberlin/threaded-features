@@ -30,7 +30,8 @@ public:
     int sampleRate;
     int bufferSize;
 
-    cv::Mat img, imgGray, imgBlur, imgblur, imgCanny, imgDilate, imgErode, kernel;
+    // cv::Mat img, imgGray, imgBlur, imgblur, imgCanny, imgDilate, imgErode, kernel;
+    cv::Mat img, kernel;
     ofImage image;
 
     ofVideoGrabber camera;
