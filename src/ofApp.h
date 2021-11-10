@@ -4,6 +4,7 @@
 #include "ofxCv.h"
 #include "ofxOpenCv.h"
 #include "threadedContourFinder.hpp"
+#include <vector>
 
 class ofApp : public ofBaseApp {
 
@@ -30,11 +31,11 @@ public:
     int sampleRate;
     int bufferSize;
 
-    // cv::Mat img, imgGray, imgBlur, imgblur, imgCanny, imgDilate, imgErode, kernel;
-    cv::Mat img, kernel;
+    cv::Mat img;
     ofImage image;
 
     ofVideoGrabber camera;
 
     threadedContourFinder find;
+    std::vector<glm::vec2> centroid, features;
 };
