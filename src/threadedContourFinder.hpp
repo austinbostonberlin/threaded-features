@@ -9,21 +9,35 @@ class threadedContourFinder : public ofThread {
 public:
     void createContours(cv::Mat img, cv::Mat imgDraw);
 
-    // void createContours(cv::Mat img);
+    void createContours(cv::Mat img);
 
     void threadedFunction();
 
-    std::vector<std::vector<cv::Point>> getContours();
+    std::vector<glm::vec2> getContours();
 
-    void setGaussian(int kernelSize, float sigmaX, float sigmaY);
-
-    void hysterisisThresholds(int lower, int upper);
-
-    void setkernel(cv::Mat newKernel);
+    std::vector<ofPolyline> getContourShape();
 
     std::vector<glm::vec2> getCentroids();
 
     std::vector<glm::vec2> getFeatures();
+
+    inline void setkernel(cv::Mat newKernel)
+    {
+        m_Kernel = newKernel;
+    }
+
+    inline void setGaussian(int kernelSize, float sigmaX, float sigmaY)
+    {
+        m_KernelSize = kernelSize;
+        m_SigmaX = sigmaX;
+        m_SigmaY = sigmaY;
+    }
+
+    inline void hysterisisThresholds(int lower, int upper)
+    {
+        m_LowerBound = lower;
+        m_UpperBound = upper;
+    }
 
     inline void setMinDistance(double distance)
     {
@@ -40,11 +54,16 @@ public:
         m_MaxCorners = corners;
     }
 
-    // void drawOnImage(cv::Mat img);
+    inline void printContours()
+    {
+        for (size_t i = 0; i < m_Contours.size(); i++) {
+            std::cout << m_Contours[i] << std::endl;
+        }
+    }
 
-    // cv::Mat drawOnImage();
-
-    // bool isThreadDone();
+    void drawContours(cv::Mat& img);
+    void drawBoundingRect(cv::Mat& img);
+    void drawContourPolygon(cv::Mat& img);
 
 private:
     cv::Mat m_img, m_greyScale, m_Blur, m_Canny, m_Dilate, m_Erode;
@@ -58,7 +77,7 @@ private:
     int m_KernelSize = 5;
     float m_SigmaX = 5, m_SigmaY = 2.5;
 
-    bool m_threadDone;
+    bool m_threadDone, m_threadRunning = false;
 
     std::vector<std::vector<cv::Point>> m_Contours;
     std::vector<cv::Vec4i> m_Hierarchy;
@@ -67,4 +86,7 @@ private:
     std::vector<cv::Moments> m_Moments;
     std::vector<cv::Point> m_Centroid;
     std::vector<cv::Point2f> m_Features;
+
+    void m_createContours();
+    void m_createExtensions();
 };

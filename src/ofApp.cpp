@@ -34,7 +34,8 @@ void ofApp::update()
 
     if (camera.isFrameNew()) {
         img = ofxCv::toCv(camera.getPixels());
-        find.createContours(img, img);
+        // find.createContours(img, img);
+        find.createContours(img);
         centroid = find.getCentroids();
         features = find.getFeatures();
     }
@@ -43,6 +44,9 @@ void ofApp::update()
 //--------------------------------------------------------------
 void ofApp::draw()
 {
+    find.drawContours(img);
+    // find.drawBoundingRect(img);
+    // find.drawContourPolygon(img);
     ofxCv::drawMat(img, 0, 0);
     // for (int i = 0; i < centroid.size(); i++) {
     //     ofDrawCircle(centroid[i], 5);
@@ -50,6 +54,14 @@ void ofApp::draw()
     for (int i = 0; i < features.size(); i++) {
         ofDrawCircle(features[i], 5);
     }
+
+    std::vector<ofPolyline> lines = find.getContourShape();
+    ofPushMatrix();
+    ofTranslate(mouseX, mouseY);
+    for (auto line : lines) {
+        line.draw();
+    }
+    ofPopMatrix();
 }
 
 //--------------------------------------------------------------
@@ -62,7 +74,9 @@ void ofApp::audioOut(ofSoundBuffer& buffer)
     }
 }
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key) { }
+void ofApp::keyPressed(int key)
+{
+}
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key) { }

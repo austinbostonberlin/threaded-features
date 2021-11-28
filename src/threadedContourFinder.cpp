@@ -6,12 +6,19 @@ void threadedContourFinder::createContours(cv::Mat img, cv::Mat imgDraw)
 {
     this->m_img = img;
     this->m_Output = imgDraw;
+    this->m_threadDone = false;
     startThread();
 }
 
-void threadedContourFinder::threadedFunction()
+void threadedContourFinder::createContours(cv::Mat img)
 {
-    // while (isThreadRunning()) {
+    this->m_img = img;
+    this->m_threadDone = false;
+    startThread();
+}
+
+void threadedContourFinder::m_createContours()
+{
     cv::cvtColor(m_img, m_greyScale, cv::COLOR_BGR2GRAY);
     cv::goodFeaturesToTrack(m_greyScale, m_Features, m_MaxCorners, m_Qualitylevel, m_MinDistance);
     cv::GaussianBlur(m_greyScale, m_Blur, cv::Size(m_KernelSize, m_KernelSize), m_SigmaX, m_SigmaY);
@@ -20,13 +27,15 @@ void threadedContourFinder::threadedFunction()
     cv::erode(m_Dilate, m_Erode, m_Kernel);
 
     cv::findContours(m_Erode, m_Contours, m_Hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-    // cv::drawContours(m_Output, m_Contours, -1, cv::Scalar(255, 0, 0), 2);
 
     m_ContourPolygon.resize(m_Contours.size());
     m_BoundingRect.resize(m_Contours.size());
     m_Moments.resize(m_Contours.size());
     m_Centroid.resize(m_Contours.size());
+}
 
+void threadedContourFinder::m_createExtensions()
+{
     for (int i = 0; i < m_Contours.size(); i++) {
         int area = cv::contourArea(m_Contours[i]);
         if (area > 1000) {
@@ -34,45 +43,43 @@ void threadedContourFinder::threadedFunction()
             m_Moments[i] = cv::moments(m_Contours[i]);
             m_Centroid[i] = cv::Point(m_Moments[i].m10 / m_Moments[i].m00, m_Moments[i].m01 / m_Moments[i].m00);
             cv::approxPolyDP(m_Contours[i], m_ContourPolygon[i], 0.02 * peri, true);
-            cv::drawContours(m_Output, m_ContourPolygon, i, cv::Scalar(255, 0, 255), 2);
-            // boundRect[i] = cv::boundingRect(contPoly[i]);
-            // cv::rectangle(m_Output, boundRect[i].tl(), boundRect[i].br(), cv::Scalar(0, 255, 0), 5);
+            m_BoundingRect[i] = cv::boundingRect(m_ContourPolygon[i]);
         }
     }
-    // }
 }
 
-std::vector<std::vector<cv::Point>> threadedContourFinder::getContours()
+void threadedContourFinder::threadedFunction()
 {
-    return m_Contours;
+    this->m_threadRunning = true;
+    this->m_createContours();
+    this->m_createExtensions();
+    this->m_threadDone = true;
+    this->m_threadRunning = false;
 }
 
-std::vector<glm::vec2> threadedContourFinder::getCentroids()
+void threadedContourFinder::drawContours(cv::Mat& img)
 {
-    vector<glm::vec2> temp;
-
-    for (auto centroid : m_Centroid) {
-        temp.push_back(ofxCv::toOf(centroid));
+    if (!m_threadDone) {
+        createContours(img);
     }
-    return temp;
+    cv::drawContours(img, m_Contours, -1, cv::Scalar(255, 0, 0), 2);
 }
 
-void threadedContourFinder::setGaussian(int kernelSize, float sigmaX, float sigmaY)
+void threadedContourFinder::drawBoundingRect(cv::Mat& img)
 {
-    m_KernelSize = kernelSize;
-    m_SigmaX = sigmaX;
-    m_SigmaY = sigmaY;
+    for (int i = 0; i < m_BoundingRect.size(); i++) {
+        cv::rectangle(img, m_BoundingRect[i].tl(), m_BoundingRect[i].br(), cv::Scalar(0, 255, 0), 5);
+    }
 }
 
-void threadedContourFinder::hysterisisThresholds(int lower, int upper)
+void threadedContourFinder::drawContourPolygon(cv::Mat& img)
 {
-    m_LowerBound = lower;
-    m_UpperBound = upper;
-}
-
-void threadedContourFinder::setkernel(cv::Mat newKernel)
-{
-    m_Kernel = newKernel;
+    if (!m_threadDone) {
+        createContours(img);
+    }
+    for (int i = 0; i < m_Contours.size(); i++) {
+        cv::drawContours(img, m_ContourPolygon, i, cv::Scalar(255, 0, 255), 2);
+    }
 }
 
 std::vector<glm::vec2> threadedContourFinder::getFeatures()
@@ -85,23 +92,36 @@ std::vector<glm::vec2> threadedContourFinder::getFeatures()
     return temp;
 }
 
-// void threadedContourFinder::createContours(cv::Mat img)
-// {
-//     this->m_img = img;
-//     startThread();
-// }
+std::vector<glm::vec2> threadedContourFinder::getContours()
+{
+    std::vector<glm::vec2> temp;
+    for (std::vector<cv::Point> contour : m_Contours) {
+        for (cv::Point point : contour) {
+            temp.push_back(ofxCv::toOf(point));
+        }
+    }
+    return temp;
+}
 
-// void threadedContourFinder::drawOnImage(cv::Mat img)
-// {
-//     img = m_Output;
-// }
+std::vector<ofPolyline> threadedContourFinder::getContourShape()
+{
+    std::vector<ofPolyline> temp;
+    for (std::vector<cv::Point> contour : m_Contours) {
+        ofPolyline line;
+        for (cv::Point shape : contour) {
+            line.addVertex(glm::vec3 { ofxCv::toOf(shape), 0.f });
+        }
+        temp.push_back(line);
+    }
+    return temp;
+}
 
-// cv::Mat threadedContourFinder::drawOnImage()
-// {
-//     return m_Output;
-// }
+std::vector<glm::vec2> threadedContourFinder::getCentroids()
+{
+    vector<glm::vec2> temp;
 
-// bool threadedContourFinder::isThreadDone()
-// {
-//     return m_threadDone;
-// }
+    for (auto centroid : m_Centroid) {
+        temp.push_back(ofxCv::toOf(centroid));
+    }
+    return temp;
+}
