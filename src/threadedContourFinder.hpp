@@ -1,5 +1,6 @@
 #pragma once
 
+#include "future"
 #include "ofMain.h"
 #include "ofxCv.h"
 #include "opencv2/opencv.hpp"
@@ -20,6 +21,8 @@ public:
     std::vector<glm::vec2> getCentroids();
 
     std::vector<glm::vec2> getFeatures();
+
+    std::vector<glm::vec2> tFeatures();
 
     inline void setkernel(cv::Mat newKernel)
     {

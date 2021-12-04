@@ -38,4 +38,7 @@ public:
 
     threadedContourFinder find;
     std::vector<glm::vec2> centroid, features;
+    int x1, y1, x2, y2;
+    bool rectDone;
+    ofRectangle mouseRect;
 };

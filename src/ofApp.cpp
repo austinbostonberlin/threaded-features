@@ -20,6 +20,11 @@ void ofApp::setup()
     find.setThreadName("openCV");
     find.setNumCorners(200);
     find.setMinDistance(20);
+    x1 = 0;
+    x2 = 0;
+    y1 = 0;
+    y2 = 0;
+    rectDone = false;
 }
 
 //--------------------------------------------------------------
@@ -27,17 +32,12 @@ void ofApp::update()
 {
     camera.update();
 
-    float newX = ofMap(mouseX, 0, ofGetWidth(), 20, 240);
-    float newY = ofMap(mouseY, 0, ofGetHeight(), 20, 240);
-
-    // find.hysterisisThresholds(newX, newY);
-
     if (camera.isFrameNew()) {
         img = ofxCv::toCv(camera.getPixels());
         // find.createContours(img, img);
         find.createContours(img);
         centroid = find.getCentroids();
-        features = find.getFeatures();
+        features = find.tFeatures();
     }
 }
 
@@ -56,12 +56,21 @@ void ofApp::draw()
     }
 
     std::vector<ofPolyline> lines = find.getContourShape();
-    ofPushMatrix();
-    ofTranslate(mouseX, mouseY);
-    for (auto line : lines) {
-        line.draw();
+    ofPolyline drawLines;
+    if (rectDone) {
+        ofDrawRectangle(mouseRect);
+        ofPushMatrix();
+        ofTranslate(mouseX, mouseY);
+        for (auto line : lines) {
+            for (size_t i = 0; i < line.size(); i++) {
+                if (mouseRect.inside(line[i])) {
+                    drawLines.addVertex(line[i]);
+                }
+            }
+        }
+        drawLines.draw();
+        ofPopMatrix();
     }
-    ofPopMatrix();
 }
 
 //--------------------------------------------------------------
@@ -88,10 +97,27 @@ void ofApp::mouseMoved(int x, int y) { }
 void ofApp::mouseDragged(int x, int y, int button) { }
 
 //--------------------------------------------------------------
-void ofApp::mousePressed(int x, int y, int button) { }
+void ofApp::mousePressed(int x, int y, int button)
+{
+    rectDone = false;
+    x1 = x;
+    y1 = y;
+}
 
 //--------------------------------------------------------------
-void ofApp::mouseReleased(int x, int y, int button) { }
+void ofApp::mouseReleased(int x, int y, int button)
+{
+    x2 = x;
+    y2 = y;
+
+    glm::vec2 l1(x1, y1), l2(x2, y1);
+    glm::vec2 h1(x2, y1), h2(x2, y2);
+    float len = glm::distance(l1, l2);
+    float heigh = glm::distance(h1, h2);
+    ofNoFill();
+    mouseRect.set(x1, y1, len, heigh);
+    rectDone = true;
+}
 
 //--------------------------------------------------------------
 void ofApp::mouseEntered(int x, int y) { }

@@ -125,3 +125,16 @@ std::vector<glm::vec2> threadedContourFinder::getCentroids()
     }
     return temp;
 }
+
+std::vector<glm::vec2> threadedContourFinder::tFeatures()
+{
+    std::future<std::vector<glm::vec2>> fu = std::async(
+        std::launch::async, [this]() {
+            vector<glm::vec2> temp;
+            for (auto feature : m_Features) {
+                temp.push_back(ofxCv::toOf(feature));
+            }
+            return temp;
+        });
+    return fu.get();
+}
