@@ -33,9 +33,9 @@ void ofApp::update()
     camera.update();
 
     if (camera.isFrameNew()) {
-        img = ofxCv::toCv(camera.getPixels());
+        Uimg = ofxCv::toCv(camera.getPixels()).getUMat(cv::ACCESS_READ);
         // find.createContours(img, img);
-        find.createContours(img);
+        find.createContours(Uimg);
         centroid = find.getCentroids();
         features = find.tFeatures();
     }
@@ -44,10 +44,10 @@ void ofApp::update()
 //--------------------------------------------------------------
 void ofApp::draw()
 {
-    find.drawContours(img);
+    find.drawContours(Uimg);
     // find.drawBoundingRect(img);
     // find.drawContourPolygon(img);
-    ofxCv::drawMat(img, 0, 0);
+    ofxCv::drawMat(Uimg.getMat(cv::ACCESS_READ), 0, 0);
     // for (int i = 0; i < centroid.size(); i++) {
     //     ofDrawCircle(centroid[i], 5);
     // }

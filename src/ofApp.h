@@ -32,6 +32,7 @@ public:
     int bufferSize;
 
     cv::Mat img;
+    cv::UMat Uimg;
     ofImage image;
 
     ofVideoGrabber camera;

@@ -8,9 +8,9 @@
 
 class threadedContourFinder : public ofThread {
 public:
-    void createContours(cv::Mat img, cv::Mat imgDraw);
+    void createContours(cv::UMat img, cv::UMat imgDraw);
 
-    void createContours(cv::Mat img);
+    void createContours(cv::UMat img);
 
     void threadedFunction();
 
@@ -64,13 +64,13 @@ public:
         }
     }
 
-    void drawContours(cv::Mat& img);
-    void drawBoundingRect(cv::Mat& img);
-    void drawContourPolygon(cv::Mat& img);
+    void drawContours(cv::UMat& img);
+    void drawBoundingRect(cv::UMat& img);
+    void drawContourPolygon(cv::UMat& img);
 
 private:
-    cv::Mat m_img, m_greyScale, m_Blur, m_Canny, m_Dilate, m_Erode;
-    cv::Mat m_Output;
+    cv::UMat m_img, m_greyScale, m_Blur, m_Canny, m_Dilate, m_Erode;
+    cv::UMat m_Output;
     cv::Mat m_Kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
 
     int m_LowerBound = 50, m_UpperBound = 150;

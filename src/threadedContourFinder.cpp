@@ -2,7 +2,7 @@
 #include "ofxCv/Utilities.h"
 #include "opencv2/imgproc.hpp"
 
-void threadedContourFinder::createContours(cv::Mat img, cv::Mat imgDraw)
+void threadedContourFinder::createContours(cv::UMat img, cv::UMat imgDraw)
 {
     this->m_img = img;
     this->m_Output = imgDraw;
@@ -10,7 +10,7 @@ void threadedContourFinder::createContours(cv::Mat img, cv::Mat imgDraw)
     startThread();
 }
 
-void threadedContourFinder::createContours(cv::Mat img)
+void threadedContourFinder::createContours(cv::UMat img)
 {
     this->m_img = img;
     this->m_threadDone = false;
@@ -57,7 +57,7 @@ void threadedContourFinder::threadedFunction()
     this->m_threadRunning = false;
 }
 
-void threadedContourFinder::drawContours(cv::Mat& img)
+void threadedContourFinder::drawContours(cv::UMat& img)
 {
     if (!m_threadDone) {
         createContours(img);
@@ -65,14 +65,14 @@ void threadedContourFinder::drawContours(cv::Mat& img)
     cv::drawContours(img, m_Contours, -1, cv::Scalar(255, 0, 0), 2);
 }
 
-void threadedContourFinder::drawBoundingRect(cv::Mat& img)
+void threadedContourFinder::drawBoundingRect(cv::UMat& img)
 {
     for (int i = 0; i < m_BoundingRect.size(); i++) {
         cv::rectangle(img, m_BoundingRect[i].tl(), m_BoundingRect[i].br(), cv::Scalar(0, 255, 0), 5);
     }
 }
 
-void threadedContourFinder::drawContourPolygon(cv::Mat& img)
+void threadedContourFinder::drawContourPolygon(cv::UMat& img)
 {
     if (!m_threadDone) {
         createContours(img);
