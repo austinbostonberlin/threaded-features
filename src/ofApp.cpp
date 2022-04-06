@@ -16,7 +16,7 @@ void ofApp::setup()
     settings.numBuffers = 2;
     // soundStream.setup(settings);
 
-    camera.initGrabber(640, 480);
+    camera.initGrabber(1920, 1080);
     find.setThreadName("openCV");
     find.setNumCorners(200);
     find.setMinDistance(20);
