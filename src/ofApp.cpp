@@ -82,6 +82,7 @@ void ofApp::audioOut(ofSoundBuffer& buffer)
         buffer[i * buffer.getNumChannels() + 1] = currentSample;
     }
 }
+
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key)
 {
