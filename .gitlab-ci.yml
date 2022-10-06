@@ -1,0 +1,15 @@
+image: alpine
+
+pages:
+  script:
+    - apk update && apk add doxygen
+    - doxygen $CI_PROJECT_DIR/doxyconf
+    - mkdir newPublic
+    - cp -r docs/html/ newPublic/
+    - mv docs/html/ public/
+  artifacts:
+    paths:
+      - public
+      - newPublic
+  only:
+    - UMat

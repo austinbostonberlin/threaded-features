@@ -1,0 +1,14 @@
+.cache/
+.ccls-cache/
+.clang-format
+obj/
+!bin/
+bin/*
+!bin/data
+bin/data/*
+!bin/data/*.vert
+!bin/data/*.frag
+tags
+compile_commands.json
+*.qbs
+docs/

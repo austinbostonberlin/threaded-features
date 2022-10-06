@@ -42,6 +42,18 @@ void ofApp::update()
 }
 
 //--------------------------------------------------------------
+//! Draw a rectanlge using `ofRect` to trace the openCV data within that rect
+//! The current properties of the world matrix are pushed by OpenGl to allow direct interaction with the rectangle
+//! ```cpp
+//! if (rectDone) {
+//!        ofDrawRectangle(mouseRect);
+//!        ofPushMatrix();
+//!        ofTranslate(mouseX, mouseY);
+//!        // Do operations here
+//!        ofPopMatrix();
+//!    }
+//! ```
+//! After the interactions are executed, the matrix is popped back on to the stack
 void ofApp::draw()
 {
     find.drawContours(Uimg);
@@ -84,20 +96,7 @@ void ofApp::audioOut(ofSoundBuffer& buffer)
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key)
-{
-}
-
-//--------------------------------------------------------------
-void ofApp::keyReleased(int key) { }
-
-//--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y) { }
-
-//--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button) { }
-
-//--------------------------------------------------------------
+//! Start drawing the rectangle on left mouse press
 void ofApp::mousePressed(int x, int y, int button)
 {
     rectDone = false;
@@ -106,6 +105,7 @@ void ofApp::mousePressed(int x, int y, int button)
 }
 
 //--------------------------------------------------------------
+//! Stop drawing the rectangle on left mouse release
 void ofApp::mouseReleased(int x, int y, int button)
 {
     x2 = x;
@@ -119,21 +119,6 @@ void ofApp::mouseReleased(int x, int y, int button)
     mouseRect.set(x1, y1, len, heigh);
     rectDone = true;
 }
-
-//--------------------------------------------------------------
-void ofApp::mouseEntered(int x, int y) { }
-
-//--------------------------------------------------------------
-void ofApp::mouseExited(int x, int y) { }
-
-//--------------------------------------------------------------
-void ofApp::windowResized(int w, int h) { }
-
-//--------------------------------------------------------------
-void ofApp::gotMessage(ofMessage msg) { }
-
-//--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo) { }
 
 //--------------------------------------------------------------
 void ofApp::exit()
